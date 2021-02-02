@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_graph"
+    app:startDestination="@id/muscleFragment">
+
+    <fragment
+        android:id="@+id/muscleFragment"
+        android:name="com.example.workouttracker.framework.presentation.musclelist.MuscleFragment"
+        android:label="MuscleFragment" >
+        <action
+            android:id="@+id/action_muscleFragment_to_muscleEquipmentFragment"
+            app:destination="@id/muscleEquipmentFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
+
+    </fragment>
+    <fragment
+        android:id="@+id/muscleEquipmentFragment"
+        android:name="com.example.workouttracker.framework.presentation.muscleequiplist.MuscleEquipmentFragment"
+        android:label="MuscleEquipmentFragment" >
+        <action
+            android:id="@+id/action_muscleEquipmentFragment_to_weightHistoryFragment"
+            app:destination="@id/weightHistoryFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            />
+        <argument
+            android:name="muscleId"
+            app:argType="string" />
+        <argument
+            android:name="muscleName"
+            app:argType="string" />
+        <argument
+            android:name="themeState"
+            app:argType="boolean" />
+    </fragment>
+    <fragment
+        android:id="@+id/weightHistoryFragment"
+        android:name="com.example.workouttracker.framework.presentation.weighthistorylist.WeightHistoryFragment"
+        android:label="WeightHistoryFragment" >
+        <argument
+            android:name="muscleEquipId"
+            app:argType="string" />
+        <argument
+            android:name="muscleEquipName"
+            app:argType="string" />
+        <argument
+            android:name="muscleName"
+            app:argType="string" />
+        <argument
+            android:name="themeState"
+            app:argType="boolean" />
+    </fragment>
+</navigation>
