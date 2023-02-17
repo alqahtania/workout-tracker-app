@@ -54,7 +54,8 @@ constructor(
             weight = domainModel.weight,
             unit = domainModel.unit,
             createdAt = dateUtil.convertToDbEntityTimeToMillis(domainModel.createdAt),
-            reps = domainModel.reps
+            reps = domainModel.reps,
+            side = domainModel.sides
         )
     }
 }

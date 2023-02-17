@@ -12,5 +12,6 @@ data class WeightHistory(
     val weight : Double,
     val unit : String,
     val createdAt : String,
-    val reps: Long? = null
+    val reps: Long? = null,
+    val sides: String? = null
 ) : Parcelable

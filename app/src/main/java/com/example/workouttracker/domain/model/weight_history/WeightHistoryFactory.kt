@@ -19,7 +19,8 @@ constructor(
         muscleEquipmentId: String,
         weight : Double,
         unit : String,
-        reps: Long
+        reps: Long,
+        sides: String
     ) : WeightHistory{
         return WeightHistory(
             id = id ?: UUID.randomUUID().toString(),
@@ -27,7 +28,8 @@ constructor(
             weight = convertWeightToTwoDecimals(weight),
             unit = unit,
             createdAt = dateUtil.getCurrentTimestamp(),
-            reps = reps
+            reps = reps,
+            sides =  sides
         )
     }
 

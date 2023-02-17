@@ -45,15 +45,16 @@ fun WeightHistoryItemInputBackground(
 
 @Composable
 fun DropdownDemo(
-    items : List<String>,
-    itemIndex : Int,
-    onItemSelectedIndex : (Int) -> Unit
+    items: List<String>,
+    itemIndex: Int,
+    onItemSelectedIndex: (Int) -> Unit
 
 ) {
     val disabledValue = items[0]
-    var showMenu by remember { mutableStateOf( false ) }
+    var showMenu by remember { mutableStateOf(false) }
     Row(
-        modifier = Modifier.width(50.dp)
+        modifier = Modifier
+            .width(50.dp)
             .clickable(onClick = { showMenu = true })
             .shadow(elevation = 2.dp, shape = CircleShape.copy(all = CornerSize(4.dp)))
             .padding(8.dp),
@@ -91,19 +92,21 @@ fun DropdownDemo(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun WeightInputField(modifier : Modifier = Modifier,
-                     items : List<String>,
-                     reps: String,
-                     itemIndex : Int,
-                     onItemSelectedIndex : (Int) -> Unit,
-                     numberValue : String,
-                     onNumberChanged : (String) -> Unit,
-                     onItemComplete : () -> Unit
-){
+fun WeightInputField(
+    modifier: Modifier = Modifier,
+    items: List<String>,
+    sideIndex: Int,
+    reps: String,
+    itemIndex: Int,
+    onItemSelectedIndex: (Int) -> Unit,
+    numberValue: String,
+    onNumberChanged: (String) -> Unit,
+    onItemComplete: () -> Unit
+) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    if(numberValue.contains(".")){
+    if (numberValue.contains(".")) {
         val number = numberValue.substring(numberValue.indexOf("."))
-        if(number.length > 3){
+        if (number.length > 3) {
             val twoDecNumber = numberValue.substring(0, numberValue.indexOf(".") + 3)
             onNumberChanged(twoDecNumber)
         }
@@ -134,7 +137,7 @@ fun WeightInputField(modifier : Modifier = Modifier,
         },
         singleLine = true,
         keyboardActions = KeyboardActions(onDone = {
-            if (numberValue.isNotBlank() && itemIndex != 0 && reps.isNotBlank()) {
+            if (numberValue.isNotBlank() && itemIndex != 0 && reps.isNotBlank() && sideIndex != 0) {
                 onItemComplete()
             }
             keyboardController?.hide()

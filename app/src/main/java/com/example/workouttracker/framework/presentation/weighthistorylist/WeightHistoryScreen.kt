@@ -33,7 +33,7 @@ import com.example.workouttracker.framework.presentation.musclelist.MuscleAlertD
 @Composable
 fun WeightHistoryScreen(
     items: List<WeightHistory>,
-    onItemComplete: (weight: Double, unit: String, reps: Long) -> Unit,
+    onItemComplete: (weight: Double, unit: String, reps: Long, sides: String) -> Unit,
     currentlyEditing: WeightHistory?,
     onStartEdit: (WeightHistory) -> Unit,
     onRemoveItem: (WeightHistory) -> Unit,
@@ -50,8 +50,8 @@ fun WeightHistoryScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             if (enableTopSection) {
-                WeightItemEntryInput(onItemComplete = { weight, unit, reps ->
-                    onItemComplete(weight, unit, reps)
+                WeightItemEntryInput(onItemComplete = { weight, unit, reps, sides ->
+                    onItemComplete(weight, unit, reps, sides)
                 })
             } else {
                 Text(
@@ -244,15 +244,17 @@ fun WeightHistoryEditRow(
 
 @Composable
 fun WeightItemEntryInput(
-    onItemComplete: (weight: Double, unit: String, reps: Long) -> Unit
+    onItemComplete: (weight: Double, unit: String, reps: Long, side: String) -> Unit
 ) {
     val items = listOf("Unit", "lbs", "kg")
+    val sides = listOf("Side", "Each Side", "All Sides")
     val (itemIndex, onItemSelectedIndex) = remember { mutableStateOf(0) }
+    val (sidesIndex, onSideSelectedIndex) = remember { mutableStateOf(0) }
     val (numberValue, onNumberChanged) = remember { mutableStateOf("") }
     val (repsValue, onRepsChanged) = remember { mutableStateOf("") }
 
     val submit = {
-        onItemComplete(numberValue.toDouble(), items[itemIndex], repsValue.toLong())
+        onItemComplete(numberValue.toDouble(), items[itemIndex], repsValue.toLong(), sides[sidesIndex])
         onItemSelectedIndex(0)
         onNumberChanged("")
         onRepsChanged("")
@@ -266,13 +268,16 @@ fun WeightItemEntryInput(
         onNumberChanged = onNumberChanged,
         onItemComplete = submit,
         repsValue = repsValue,
-        onRepsValueChanged = onRepsChanged
+        onRepsValueChanged = onRepsChanged,
+        sides= sides,
+        sideIndex = sidesIndex,
+        onSideSelectedIndex = onSideSelectedIndex
     ) {
 
         WeightAddButton(
             onClick = submit,
             text = "Add",
-            enabled = numberValue.isNotBlank() && (itemIndex != 0) && repsValue.isNotBlank()
+            enabled = numberValue.isNotBlank() && (itemIndex != 0) && repsValue.isNotBlank() && sidesIndex != 0
         )
     }
 
@@ -283,8 +288,11 @@ fun WeightItemEntryInput(
 @Composable
 fun WeightItemInput(
     items: List<String>,
+    sides: List<String>,
     itemIndex: Int,
+    sideIndex: Int,
     onItemSelectedIndex: (Int) -> Unit,
+    onSideSelectedIndex: (Int) -> Unit,
     numberValue: String,
     repsValue: String,
     onRepsValueChanged: (String) -> Unit,
@@ -310,17 +318,20 @@ fun WeightItemInput(
                 numberValue = numberValue,
                 onNumberChanged = onNumberChanged,
                 onItemComplete = onItemComplete,
-                reps = repsValue
+                reps = repsValue,
+                sideIndex = sideIndex
             )
 
             Spacer(modifier = Modifier.width(8.dp))
             TextField(
                 modifier = Modifier.weight(0.30f),
                 value = repsValue, onValueChange = onRepsValueChanged,
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.NumberPassword),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.NumberPassword
+                ),
                 keyboardActions = KeyboardActions(onDone = {
-                    if (numberValue.isNotBlank() && itemIndex != 0 && repsValue.isNotBlank()) {
+                    if (numberValue.isNotBlank() && itemIndex != 0 && repsValue.isNotBlank() && sideIndex != 0) {
                         onItemComplete()
                     }
                     keyboardController?.hide()
@@ -332,10 +343,18 @@ fun WeightItemInput(
                 },
                 maxLines = 1
             )
+
+            DropdownDemo(
+                items = sides,
+                itemIndex = sideIndex,
+                onItemSelectedIndex = onSideSelectedIndex
+            )
+
             Box(
                 Modifier
                     .align(Alignment.CenterVertically)
-                    .weight(0.20f)) { buttonSlot() }
+                    .weight(0.20f)
+            ) { buttonSlot() }
 
         }
     }
