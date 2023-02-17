@@ -70,6 +70,7 @@ fun MuscleScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(items) { item ->
+                Spacer(modifier = Modifier.height(16.dp))
                 if (currentlyEditing?.id == item.id) {
                     MuscleItemInlineEditorEntryInput(
                         item = item,
@@ -133,7 +134,7 @@ fun MuscleRow(
 
 //        Text(text = muscle.createdAt)
     }
-
+    Spacer(modifier = Modifier.height(24.dp))
 }
 
 
