@@ -5,10 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -16,10 +15,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.workouttracker.domain.model.weight_history.WeightHistory
@@ -30,7 +33,7 @@ import com.example.workouttracker.framework.presentation.musclelist.MuscleAlertD
 @Composable
 fun WeightHistoryScreen(
     items: List<WeightHistory>,
-    onItemComplete: (weight: Double, unit: String) -> Unit,
+    onItemComplete: (weight: Double, unit: String, reps: Long) -> Unit,
     currentlyEditing: WeightHistory?,
     onStartEdit: (WeightHistory) -> Unit,
     onRemoveItem: (WeightHistory) -> Unit,
@@ -47,8 +50,8 @@ fun WeightHistoryScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             if (enableTopSection) {
-                WeightItemEntryInput(onItemComplete = { weight, unit ->
-                    onItemComplete(weight, unit)
+                WeightItemEntryInput(onItemComplete = { weight, unit, reps ->
+                    onItemComplete(weight, unit, reps)
                 })
             } else {
                 Text(
@@ -96,7 +99,7 @@ fun WeightHistoryScreen(
                     var modifier = Modifier
                         .padding(horizontal = 8.dp)
                         .shadow(elevation = 8.dp, shape = CircleShape)
-                    if(maxValueWeight?.id == item.id){
+                    if (maxValueWeight?.id == item.id) {
                         modifier = modifier.background(color = Color.Green)
                     }
                     WeightHistoryRow(
@@ -131,7 +134,7 @@ fun WeightHistoryRow(
                 onClick = {
                     onItemClicked()
                 },
-                onLongClick = {onItemLongClicked()}
+                onLongClick = { onItemLongClicked() }
             )
 //            .longPressGestureFilter {  }
             .padding(16.dp)
@@ -151,28 +154,29 @@ fun WeightHistoryRow(
         Column {
 
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    Text(text = "${convertWeightToTwoDecimals(lbs)} lbs")
-                    Text(text = "${convertWeightToTwoDecimals(kg)} kg")
-                    if (buttonSlot != null) {
-                        Box(Modifier.align(Alignment.CenterVertically)) {
-                            buttonSlot()
-                        }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Text(text = "${convertWeightToTwoDecimals(lbs)} lbs")
+                Text(text = "${convertWeightToTwoDecimals(kg)} kg")
+                if (buttonSlot != null) {
+                    Box(Modifier.align(Alignment.CenterVertically)) {
+                        buttonSlot()
                     }
                 }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Text(text = dateUtil.removeTimeFromDateString(weightHistory.createdAt))
-                }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Text(text = "${weightHistory.reps} Reps")
+                Text(text = dateUtil.removeTimeFromDateString(weightHistory.createdAt))
             }
         }
+    }
 }
 
 
@@ -198,31 +202,31 @@ fun WeightHistoryEditRow(
 
 
         val (openDialog, dialogChange) = remember { mutableStateOf(false) }
-            Row(horizontalArrangement = Arrangement.Center) {
-                val shrinkButtons = Modifier.widthIn(20.dp)
+        Row(horizontalArrangement = Arrangement.Center) {
+            val shrinkButtons = Modifier.widthIn(20.dp)
 
-                TextButton(
-                    onClick = { dialogChange(true) },
-                    modifier = shrinkButtons
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        "",
-                        tint = Color.Red,
-                        modifier = Modifier
-                            .width(30.dp)
-                    )
-                }
-
-                TextButton(onClick = onEditDone, modifier = shrinkButtons) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        "",
-                        tint = Color.Red,
-                        modifier = Modifier.width(30.dp)
-                    )
-                }
+            TextButton(
+                onClick = { dialogChange(true) },
+                modifier = shrinkButtons
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    "",
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .width(30.dp)
+                )
             }
+
+            TextButton(onClick = onEditDone, modifier = shrinkButtons) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    "",
+                    tint = Color.Red,
+                    modifier = Modifier.width(30.dp)
+                )
+            }
+        }
         if (openDialog) {
             MuscleAlertDialog(
                 openDialog = openDialog,
@@ -240,16 +244,18 @@ fun WeightHistoryEditRow(
 
 @Composable
 fun WeightItemEntryInput(
-    onItemComplete: (weight: Double, unit: String) -> Unit
+    onItemComplete: (weight: Double, unit: String, reps: Long) -> Unit
 ) {
     val items = listOf("Unit", "lbs", "kg")
     val (itemIndex, onItemSelectedIndex) = remember { mutableStateOf(0) }
     val (numberValue, onNumberChanged) = remember { mutableStateOf("") }
+    val (repsValue, onRepsChanged) = remember { mutableStateOf("") }
 
     val submit = {
-        onItemComplete(numberValue.toDouble(), items[itemIndex])
+        onItemComplete(numberValue.toDouble(), items[itemIndex], repsValue.toLong())
         onItemSelectedIndex(0)
         onNumberChanged("")
+        onRepsChanged("")
     }
 
     WeightItemInput(
@@ -258,47 +264,80 @@ fun WeightItemEntryInput(
         onItemSelectedIndex = onItemSelectedIndex,
         numberValue = numberValue,
         onNumberChanged = onNumberChanged,
-        onItemComplete = submit
+        onItemComplete = submit,
+        repsValue = repsValue,
+        onRepsValueChanged = onRepsChanged
     ) {
 
         WeightAddButton(
             onClick = submit,
             text = "Add",
-            enabled = numberValue.isNotBlank() && (itemIndex != 0)
+            enabled = numberValue.isNotBlank() && (itemIndex != 0) && repsValue.isNotBlank()
         )
     }
 
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun WeightItemInput(
     items: List<String>,
     itemIndex: Int,
     onItemSelectedIndex: (Int) -> Unit,
     numberValue: String,
+    repsValue: String,
+    onRepsValueChanged: (String) -> Unit,
     onNumberChanged: (String) -> Unit,
     onItemComplete: () -> Unit,
     buttonSlot: @Composable () -> Unit
 ) {
-
+    val keyboardController = LocalSoftwareKeyboardController.current
     Column {
         Row(
             modifier = Modifier
                 .padding(horizontal = 8.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         )
         {
             WeightInputField(
+                modifier = Modifier.weight(0.5f),
                 items = items,
                 itemIndex = itemIndex,
                 onItemSelectedIndex = onItemSelectedIndex,
                 numberValue = numberValue,
                 onNumberChanged = onNumberChanged,
-                onItemComplete = onItemComplete
+                onItemComplete = onItemComplete,
+                reps = repsValue
             )
 
             Spacer(modifier = Modifier.width(8.dp))
-            Box(Modifier.align(Alignment.CenterVertically)) { buttonSlot() }
+            TextField(
+                modifier = Modifier.weight(0.30f),
+                value = repsValue, onValueChange = onRepsValueChanged,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Number
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    if (numberValue.isNotBlank() && itemIndex != 0 && repsValue.isNotBlank()) {
+                        onItemComplete()
+                    }
+                    keyboardController?.hide()
+                }),
+                singleLine = true,
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
+                placeholder = {
+                    Text(text = "Reps")
+                },
+                maxLines = 1
+            )
+            Box(
+                Modifier
+                    .align(Alignment.CenterVertically)
+                    .weight(0.20f)) { buttonSlot() }
 
         }
     }

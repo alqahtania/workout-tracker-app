@@ -93,6 +93,7 @@ fun DropdownDemo(
 @Composable
 fun WeightInputField(modifier : Modifier = Modifier,
                      items : List<String>,
+                     reps: String,
                      itemIndex : Int,
                      onItemSelectedIndex : (Int) -> Unit,
                      numberValue : String,
@@ -121,7 +122,7 @@ fun WeightInputField(modifier : Modifier = Modifier,
         ),
         maxLines = 1,
         placeholder = {
-            Text(text = "0")
+            Text(text = "Weight")
         },
         trailingIcon = {
             DropdownDemo(
@@ -133,7 +134,7 @@ fun WeightInputField(modifier : Modifier = Modifier,
         },
         singleLine = true,
         keyboardActions = KeyboardActions(onDone = {
-            if (numberValue.isNotBlank() && itemIndex != 0) {
+            if (numberValue.isNotBlank() && itemIndex != 0 && reps.isNotBlank()) {
                 onItemComplete()
             }
             keyboardController?.hide()

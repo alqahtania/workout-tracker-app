@@ -11,5 +11,6 @@ data class WeightHistory(
     val muscleEquipmentId: String,
     val weight : Double,
     val unit : String,
-    val createdAt : String
+    val createdAt : String,
+    val reps: Long? = null
 ) : Parcelable

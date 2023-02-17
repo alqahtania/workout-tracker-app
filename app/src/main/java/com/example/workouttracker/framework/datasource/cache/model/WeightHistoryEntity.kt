@@ -26,5 +26,6 @@ data class WeightHistoryEntity(
     var weight : Double,
     var unit : String,
     @ColumnInfo(name = "created_at")
-    var createdAt : Long
+    var createdAt : Long,
+    var reps: Long? = null
 )

@@ -107,11 +107,12 @@ class WeightHistoryFragment : Fragment() {
         val maxWeightHistory = viewModel.maxWeightHistory.observeAsState()
         WeightHistoryScreen(
             items = weightHistoryList.value,
-            onItemComplete = { weight, unit ->
+            onItemComplete = { weight, unit, reps ->
                 val newHistory = weightHistoryFactory.createSingleWeightHistory(
                     muscleEquipmentId = args.muscleEquipId,
                     weight = weight,
-                    unit = unit
+                    unit = unit,
+                    reps = reps
                 )
                 val stateEvent = WeightHistoryStateEvent.InsertWeightHistoryEvent(newHistory)
 

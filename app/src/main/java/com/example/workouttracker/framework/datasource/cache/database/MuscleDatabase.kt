@@ -1,5 +1,6 @@
 package com.example.workouttracker.framework.datasource.cache.database
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.workouttracker.cache.dao.MuscleDao
@@ -14,8 +15,11 @@ import com.example.workouttracker.framework.datasource.cache.model.WeightHistory
     entities = [MuscleEntity::class,
         MuscleEquipmentEntity::class,
         WeightHistoryEntity::class],
-    version = 1,
-    exportSchema = false
+    version = 2,
+    exportSchema = true,
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2)
+    ]
 )
 abstract class MuscleDatabase : RoomDatabase() {
 

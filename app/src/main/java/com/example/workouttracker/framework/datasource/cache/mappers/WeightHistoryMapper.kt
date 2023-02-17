@@ -42,7 +42,8 @@ constructor(
             muscleEquipmentId = entity.muscleEquipmentId,
             weight = entity.weight,
             unit = entity.unit,
-            createdAt = dateUtil.convertFromDbEntityTimeToStringDate(entity.createdAt)
+            createdAt = dateUtil.convertFromDbEntityTimeToStringDate(entity.createdAt),
+            reps = entity.reps
         )
     }
 
@@ -52,7 +53,8 @@ constructor(
             muscleEquipmentId = domainModel.muscleEquipmentId,
             weight = domainModel.weight,
             unit = domainModel.unit,
-            createdAt = dateUtil.convertToDbEntityTimeToMillis(domainModel.createdAt)
+            createdAt = dateUtil.convertToDbEntityTimeToMillis(domainModel.createdAt),
+            reps = domainModel.reps
         )
     }
 }
