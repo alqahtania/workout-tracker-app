@@ -249,6 +249,7 @@ class MuscleEquipmentFragment : Fragment() {
             navigationIcon = {
                 Icon(
                     Icons.Rounded.ArrowBack,
+                    "",
                     Modifier
                         .clickable(onClick = onIconClicked)
                         .padding(horizontal = 12.dp)

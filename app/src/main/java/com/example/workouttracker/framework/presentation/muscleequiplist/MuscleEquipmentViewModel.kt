@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.core.content.FileProvider
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*

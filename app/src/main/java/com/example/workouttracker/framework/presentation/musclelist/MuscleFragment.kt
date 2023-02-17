@@ -13,6 +13,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -145,7 +146,8 @@ class MuscleFragment : Fragment() {
         TopAppBar(
             navigationIcon = {
                 Icon(
-                    bitmap = imageResource(id = R.drawable.ic_launcher_foreground),
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    "",
                     Modifier
                         .clickable(onClick = { onClickChangeTheme() })
                         .padding(horizontal = 12.dp)

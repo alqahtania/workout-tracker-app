@@ -2,12 +2,10 @@ package com.example.workouttracker.framework.presentation.muscleequiplist
 
 import android.graphics.Bitmap
 import android.util.LruCache
-import androidx.compose.animation.transition
 import androidx.compose.foundation.*
-import androidx.compose.foundation.animation.smoothScrollBy
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -18,19 +16,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.longPressGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.loadImageResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.workouttracker.R
 import com.example.workouttracker.domain.model.muscle_equipment.MuscleEquipment
 import com.example.workouttracker.domain.model.muscle_equipment.MuscleEquipmentPhoto
 import com.example.workouttracker.domain.util.DateUtil
-import com.example.workouttracker.framework.presentation.musclelist.ListItemsAnimationDefinitions
 
 
 @Composable
@@ -52,12 +47,6 @@ fun MuscleEquipmentScreen(
 ) {
 
     Column {
-        val pulseAnim = transition(
-            definition = ListItemsAnimationDefinitions.spreadDefinition,
-            initState = ListItemsAnimationDefinitions.SpreadState.INITIAL,
-            toState = ListItemsAnimationDefinitions.SpreadState.FINAL
-        )
-        val pulseMagnitude = pulseAnim[ListItemsAnimationDefinitions.spreadPropKey]
         val enableTopSection = currentlyEditing == null
 
         MuscleItemInputBackground(
@@ -85,7 +74,6 @@ fun MuscleEquipmentScreen(
             contentPadding = PaddingValues(top = 8.dp)
         )
         {
-
             items(items) { item ->
                 if (currentlyEditing?.id == item.id) {
                     MuscleItemInlineEditorEntryInput(
@@ -110,9 +98,7 @@ fun MuscleEquipmentScreen(
                             onItemClickedNavigate(item)
                         },
                         modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .fillParentMaxWidth(pulseMagnitude),
-                        currentWidth = pulseMagnitude,
+                            .padding(horizontal = 8.dp),
                         onImageIconClick = { onImageIconClick(item) },
                         onImageClicked = onImageClicked,
                         isImageLoading = isImageLoading,
@@ -129,6 +115,7 @@ fun MuscleEquipmentScreen(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MuscleRow(
     muscleEquip: MuscleEquipment,
@@ -140,17 +127,13 @@ fun MuscleRow(
     isImageLoading: Boolean,
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    currentWidth: Float,
     dateUtil: DateUtil
 ) {
     Row(
-        modifier = modifier
-            .clickable(onClick = { onItemClicked() })
-            .longPressGestureFilter { onItemLongClicked() },
+        modifier = modifier.combinedClickable(onClick = { onItemClicked() }, onLongClick = {onItemLongClicked()}),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
 
-        if (ListItemsAnimationDefinitions.MAX_WIDTH == currentWidth) {
             Card(
                 modifier,
                 elevation = 3.dp
@@ -164,10 +147,11 @@ fun MuscleRow(
                         cachedBitmap?.let {
                             Image(
                                 bitmap = it.asImageBitmap(),
+                                "",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .clickable(onClick = { onImageClicked(equipPhoto) })
-                                    .preferredHeightIn(max = 190.dp, min = 190.dp)
+                                    .heightIn(max = 190.dp, min = 190.dp)
                                     .fillMaxWidth()
                             )
                         }
@@ -178,7 +162,7 @@ fun MuscleRow(
                         if (isImageLoading) {
                             Box(
                                 modifier = Modifier
-                                    .preferredHeightIn(max = 190.dp, min = 190.dp)
+                                    .heightIn(max = 190.dp, min = 190.dp)
                                     .fillMaxWidth()
                             ) {
                                 CircularProgressIndicator(
@@ -188,11 +172,12 @@ fun MuscleRow(
                         } else {
 
                             Image(
-                                bitmap = imageResource(id = R.drawable.placeholder_image),
+                                painter = painterResource(id = R.drawable.placeholder_image),
+                                "",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .clickable(onClick = { /*TODO OPEN NEW PIC CAPTURE INTENT*/ })
-                                    .preferredHeightIn(max = 190.dp, min = 190.dp)
+                                    .heightIn(max = 190.dp, min = 190.dp)
                                     .fillMaxWidth()
                             )
                         }
@@ -200,7 +185,7 @@ fun MuscleRow(
 
                     }
 
-                    Spacer(Modifier.preferredHeight(16.dp))
+                    Spacer(Modifier.height(16.dp))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -225,6 +210,7 @@ fun MuscleRow(
 
                         Icon(
                             Icons.Default.AddAPhoto,
+                            "",
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .clickable(onClick = { onImageIconClick() })
@@ -240,9 +226,6 @@ fun MuscleRow(
 
 
         }
-
-    }
-
 
 }
 
@@ -418,6 +401,7 @@ fun MuscleUpdatingButtons(
         TextButton(onClick = submit, modifier = shrinkButtons, enabled = enabledSaveButton) {
             Icon(
                 imageVector = Icons.Default.Save,
+                "",
                 tint = if (enabledSaveButton) Color.Black else Color.LightGray,
                 modifier = Modifier.width(30.dp)
             )
@@ -426,6 +410,7 @@ fun MuscleUpdatingButtons(
         TextButton(onClick = { dialogChange(true) }, modifier = shrinkButtons) {
             Icon(
                 imageVector = Icons.Default.Delete,
+                "",
                 tint = Color.Red,
                 modifier = Modifier.width(30.dp)
             )
@@ -434,6 +419,7 @@ fun MuscleUpdatingButtons(
         TextButton(onClick = onEditDone, modifier = shrinkButtons) {
             Icon(
                 imageVector = Icons.Default.Close,
+                "",
                 tint = Color.Red,
                 modifier = Modifier.width(30.dp)
             )

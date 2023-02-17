@@ -1,9 +1,9 @@
 package com.example.workouttracker.framework.presentation.musclelist
 
-import androidx.compose.animation.transition
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.Icon
@@ -14,20 +14,16 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.gesture.longPressGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.workouttracker.domain.model.muscle.Muscle
 import com.example.workouttracker.domain.model.muscle.MuscleFactory
 import com.example.workouttracker.domain.util.DateUtil
-import com.example.workouttracker.framework.presentation.musclelist.ListItemsAnimationDefinitions.MAX_WIDTH
 
 
 @Composable
@@ -45,12 +41,7 @@ fun MuscleScreen(
 ) {
 
     Column {
-        val pulseAnim = transition(
-            definition = ListItemsAnimationDefinitions.spreadDefinition,
-            initState = ListItemsAnimationDefinitions.SpreadState.INITIAL,
-            toState = ListItemsAnimationDefinitions.SpreadState.FINAL
-        )
-        val pulseMagnitude = pulseAnim[ListItemsAnimationDefinitions.spreadPropKey]
+
         val enableTopSection = currentlyEditing == null
         MuscleItemInputBackground(
             elevate = enableTopSection,
@@ -101,9 +92,7 @@ fun MuscleScreen(
                         },
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
-                            .fillParentMaxWidth(pulseMagnitude)
-                            .shadow(elevation = pulseMagnitude.dp, shape = CircleShape),
-                        currentWidth = pulseMagnitude,
+                            .shadow(elevation = 8.dp, shape = CircleShape),
                         dateUtil = dateUtil
                     )
                 }
@@ -117,29 +106,30 @@ fun MuscleScreen(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MuscleRow(
     muscle: Muscle,
     onItemLongClicked: () -> Unit,
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    currentWidth: Float,
     dateUtil: DateUtil
 ) {
     Row(
         modifier = modifier
-            .clickable(
+            .fillMaxWidth()
+            .combinedClickable(
                 onClick = {
                     onItemClicked()
-                }
+                },
+                onLongClick = { onItemLongClicked() }
             )
-            .longPressGestureFilter { onItemLongClicked() }
             .padding(16.dp),
         horizontalArrangement = Arrangement.Center
     ) {
-        if (MAX_WIDTH == currentWidth) {
-            Text(text = muscle.name)
-        }
+
+        Text(text = muscle.name)
+
 
 //        Text(text = muscle.createdAt)
     }
@@ -265,6 +255,7 @@ fun MuscleUpdatingButtons(
         TextButton(onClick = submit, modifier = shrinkButtons, enabled = enabledSaveButton) {
             Icon(
                 imageVector = Icons.Default.Save,
+                "",
                 tint = if (enabledSaveButton) Color.Black else Color.LightGray,
                 modifier = Modifier.width(30.dp)
             )
@@ -273,6 +264,7 @@ fun MuscleUpdatingButtons(
         TextButton(onClick = { dialogChange(true) }, modifier = shrinkButtons) {
             Icon(
                 imageVector = Icons.Default.Delete,
+                "",
                 tint = Color.Red,
                 modifier = Modifier.width(30.dp)
             )
@@ -281,6 +273,7 @@ fun MuscleUpdatingButtons(
         TextButton(onClick = onEditDone, modifier = shrinkButtons) {
             Icon(
                 imageVector = Icons.Default.Close,
+                "",
                 tint = Color.Red,
                 modifier = Modifier.width(30.dp)
             )

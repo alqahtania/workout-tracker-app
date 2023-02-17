@@ -1,12 +1,9 @@
 package com.example.workouttracker.framework.presentation.weighthistorylist
 
-import androidx.compose.animation.transition
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -15,28 +12,19 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.gesture.longPressGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.workouttracker.domain.model.muscle.Muscle
 import com.example.workouttracker.domain.model.weight_history.WeightHistory
-import com.example.workouttracker.domain.model.weight_history.WeightHistoryFactory
 import com.example.workouttracker.domain.util.DateUtil
-import com.example.workouttracker.framework.presentation.musclelist.ListItemsAnimationDefinitions
-import com.example.workouttracker.framework.presentation.musclelist.ListItemsAnimationDefinitions.MAX_WIDTH
 import com.example.workouttracker.framework.presentation.musclelist.MuscleAlertDialog
-import com.example.workouttracker.framework.presentation.musclelist.PulseAnimationDefinitions
-import org.w3c.dom.Text
 
 
 @Composable
@@ -53,12 +41,6 @@ fun WeightHistoryScreen(
 
     Column {
         //We moved the animation from inside the lazyColumn to avoid recomposition and reanimation
-        val pulseAnim = transition(
-            definition = ListItemsAnimationDefinitions.spreadDefinition,
-            initState = ListItemsAnimationDefinitions.SpreadState.INITIAL,
-            toState = ListItemsAnimationDefinitions.SpreadState.FINAL
-        )
-        val pulseMagnitude = pulseAnim[ListItemsAnimationDefinitions.spreadPropKey]
         val enableTopSection = currentlyEditing == null
         WeightHistoryItemInputBackground(
             elevate = enableTopSection,
@@ -91,12 +73,6 @@ fun WeightHistoryScreen(
         ) {
             items(items) { item ->
                 if (currentlyEditing?.id == item.id) {
-                    val pulseAnim = transition(
-                        definition = PulseAnimationDefinitions.pulseDefinition,
-                        initState = PulseAnimationDefinitions.PulseState.INITIAL,
-                        toState = PulseAnimationDefinitions.PulseState.FINAL
-                    )
-                    val pulseMag = pulseAnim[PulseAnimationDefinitions.pulsePropKey]
                     WeightHistoryEditRow(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
@@ -105,7 +81,7 @@ fun WeightHistoryScreen(
                             .border(
                                 border = BorderStroke(
                                     1.dp,
-                                    color = Color.Red.copy(alpha = pulseMag)
+                                    color = Color.Red
                                 )
                             ),
                         weightHistory = item,
@@ -115,13 +91,11 @@ fun WeightHistoryScreen(
                         },
                         onEditDone = onEditDone,
                         dateUtil = dateUtil,
-                        currentWidth = pulseMagnitude
                     )
                 } else {
                     var modifier = Modifier
                         .padding(horizontal = 8.dp)
-                        .fillParentMaxWidth(pulseMagnitude)
-                        .shadow(elevation = pulseMagnitude.dp, shape = CircleShape)
+                        .shadow(elevation = 8.dp, shape = CircleShape)
                     if(maxValueWeight?.id == item.id){
                         modifier = modifier.background(color = Color.Green)
                     }
@@ -132,7 +106,6 @@ fun WeightHistoryScreen(
                             onStartEdit(item)
                         },
                         dateUtil = dateUtil,
-                        currentWidth = pulseMagnitude
                     )
                 }
                 Spacer(modifier = Modifier.padding(top = 8.dp))
@@ -142,19 +115,19 @@ fun WeightHistoryScreen(
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WeightHistoryRow(
     modifier: Modifier = Modifier,
     weightHistory: WeightHistory,
     onItemLongClicked: () -> Unit,
     onItemClicked: () -> Unit = {},
-    currentWidth: Float,
     dateUtil: DateUtil,
     buttonSlot: @Composable (() -> Unit)? = null
 ) {
     Row(
         modifier = modifier
-            .clickable(
+            .combinedClickable(
                 onClick = {
                     onItemClicked()
                 },
@@ -176,7 +149,6 @@ fun WeightHistoryRow(
             }
         }
         Column {
-            if (MAX_WIDTH == currentWidth) {
 
 
                 Row(
@@ -201,10 +173,6 @@ fun WeightHistoryRow(
                 }
             }
         }
-
-
-    }
-
 }
 
 
@@ -217,7 +185,6 @@ fun WeightHistoryEditRow(
     modifier: Modifier = Modifier,
     weightHistory: WeightHistory,
     onRemoveItem: () -> Unit,
-    currentWidth: Float,
     onEditDone: () -> Unit,
     dateUtil: DateUtil,
 ) {
@@ -226,14 +193,11 @@ fun WeightHistoryEditRow(
         modifier = modifier,
         weightHistory = weightHistory,
         onItemLongClicked = { },
-        currentWidth = currentWidth,
         dateUtil = dateUtil
     ) {
 
 
         val (openDialog, dialogChange) = remember { mutableStateOf(false) }
-        if (MAX_WIDTH == currentWidth) {
-
             Row(horizontalArrangement = Arrangement.Center) {
                 val shrinkButtons = Modifier.widthIn(20.dp)
 
@@ -243,6 +207,7 @@ fun WeightHistoryEditRow(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
+                        "",
                         tint = Color.Red,
                         modifier = Modifier
                             .width(30.dp)
@@ -252,12 +217,12 @@ fun WeightHistoryEditRow(
                 TextButton(onClick = onEditDone, modifier = shrinkButtons) {
                     Icon(
                         imageVector = Icons.Default.Close,
+                        "",
                         tint = Color.Red,
                         modifier = Modifier.width(30.dp)
                     )
                 }
             }
-        }
         if (openDialog) {
             MuscleAlertDialog(
                 openDialog = openDialog,

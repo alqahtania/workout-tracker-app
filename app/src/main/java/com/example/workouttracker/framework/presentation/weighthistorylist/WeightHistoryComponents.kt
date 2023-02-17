@@ -1,22 +1,24 @@
 package com.example.workouttracker.framework.presentation.weighthistorylist
 
 import android.widget.Toast
-import androidx.compose.animation.animate
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -29,14 +31,12 @@ fun WeightHistoryItemInputBackground(
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
-    val animatedElevation = animate(if (elevate) 1.dp else 0.dp, TweenSpec(500))
     Surface(
         color = MaterialTheme.colors.onSurface.copy(alpha = 0.05f),
-        elevation = animatedElevation,
         shape = RectangleShape,
     ) {
         Row(
-            modifier = modifier.animateContentSize(animSpec = TweenSpec(300)),
+            modifier = modifier.animateContentSize(TweenSpec(300)),
             content = content
         )
     }
@@ -52,29 +52,25 @@ fun DropdownDemo(
 ) {
     val disabledValue = items[0]
     var showMenu by remember { mutableStateOf( false ) }
-    DropdownMenu(
-        toggle = {
-            Row(
-                modifier = Modifier.width(50.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    items[itemIndex]
-                )
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown
-                )
-
-            }
-
-        },
-        expanded = showMenu,
-        onDismissRequest = { showMenu = false },
-        toggleModifier = Modifier
+    Row(
+        modifier = Modifier.width(50.dp)
             .clickable(onClick = { showMenu = true })
             .shadow(elevation = 2.dp, shape = CircleShape.copy(all = CornerSize(4.dp)))
             .padding(8.dp),
-        dropdownModifier = Modifier
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            items[itemIndex]
+        )
+        Icon(
+            imageVector = Icons.Default.ArrowDropDown,
+            ""
+        )
+
+    }
+    DropdownMenu(
+        expanded = showMenu,
+        onDismissRequest = { showMenu = false }
 //                .background(Color.Red)
     ) {
         items.forEachIndexed { index, item ->
@@ -93,6 +89,7 @@ fun DropdownDemo(
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun WeightInputField(modifier : Modifier = Modifier,
                      items : List<String>,
@@ -102,7 +99,7 @@ fun WeightInputField(modifier : Modifier = Modifier,
                      onNumberChanged : (String) -> Unit,
                      onItemComplete : () -> Unit
 ){
-
+    val keyboardController = LocalSoftwareKeyboardController.current
     if(numberValue.contains(".")){
         val number = numberValue.substring(numberValue.indexOf("."))
         if(number.length > 3){
@@ -113,7 +110,7 @@ fun WeightInputField(modifier : Modifier = Modifier,
 
     TextField(
         modifier = modifier,
-        backgroundColor = Color.Transparent,
+        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
         value = numberValue,
         onValueChange = {
             onNumberChanged(it)
@@ -135,15 +132,12 @@ fun WeightInputField(modifier : Modifier = Modifier,
 
         },
         singleLine = true,
-        onImeActionPerformed = { action, softKeybController ->
-            if (action == ImeAction.Done) {
-                if (numberValue.isNotBlank() && itemIndex != 0) {
-                    onItemComplete()
-                }
-                softKeybController?.hideSoftwareKeyboard()
+        keyboardActions = KeyboardActions(onDone = {
+            if (numberValue.isNotBlank() && itemIndex != 0) {
+                onItemComplete()
             }
-
-        }
+            keyboardController?.hide()
+        })
     )
 }
 

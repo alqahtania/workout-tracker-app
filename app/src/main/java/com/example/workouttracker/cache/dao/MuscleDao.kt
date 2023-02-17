@@ -13,7 +13,7 @@ interface MuscleDao {
     suspend fun insertMuscle(muscle : MuscleEntity) : Long
 
     @Query("SELECT * FROM muscle WHERE id = :id")
-    suspend fun searchMuscleById(id : String) : MuscleEntity?
+    fun searchMuscleById(id : String) : MuscleEntity?
 
     @Query("SELECT * FROM muscle")
     fun getAllMuscles() : Flow<List<MuscleEntity>>
@@ -22,7 +22,7 @@ interface MuscleDao {
     suspend fun deleteMuscle(muscleEntity: MuscleEntity) : Int
 
     @Query("DELETE FROM muscle WHERE id = :muscleId")
-    suspend fun deleteMuscleById(muscleId : String) : Int
+    fun deleteMuscleById(muscleId : String) : Int
 
 
     @Update
