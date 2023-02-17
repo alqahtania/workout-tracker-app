@@ -317,10 +317,8 @@ fun WeightItemInput(
             TextField(
                 modifier = Modifier.weight(0.30f),
                 value = repsValue, onValueChange = onRepsValueChanged,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Number
-                ),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.NumberPassword),
                 keyboardActions = KeyboardActions(onDone = {
                     if (numberValue.isNotBlank() && itemIndex != 0 && repsValue.isNotBlank()) {
                         onItemComplete()

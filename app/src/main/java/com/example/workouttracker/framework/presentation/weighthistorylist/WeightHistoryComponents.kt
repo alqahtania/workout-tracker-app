@@ -118,7 +118,7 @@ fun WeightInputField(modifier : Modifier = Modifier,
         },
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Number
+            keyboardType = KeyboardType.Phone
         ),
         maxLines = 1,
         placeholder = {
