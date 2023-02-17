@@ -58,6 +58,9 @@ fun MuscleInputText(
     TextField(
         value = text,
         onValueChange = onTextChanged,
+        label = {
+            Text(text = "Which Equipment?")
+        },
         maxLines = 1,
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = {

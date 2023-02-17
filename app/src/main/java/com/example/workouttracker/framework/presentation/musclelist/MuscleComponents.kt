@@ -54,6 +54,9 @@ fun MuscleInputText(
         value = text,
         onValueChange = onTextChanged,
         colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
+        label = {
+            Text(text = "What Muscle?")
+        },
         maxLines = 1,
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = {

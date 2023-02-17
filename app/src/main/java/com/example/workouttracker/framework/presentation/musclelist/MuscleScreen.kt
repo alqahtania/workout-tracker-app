@@ -41,7 +41,6 @@ fun MuscleScreen(
 ) {
 
     Column {
-
         val enableTopSection = currentlyEditing == null
         MuscleItemInputBackground(
             elevate = enableTopSection,
@@ -92,7 +91,8 @@ fun MuscleScreen(
                         },
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
-                            .shadow(elevation = 8.dp, shape = CircleShape),
+                            .shadow(elevation = 8.dp, shape = CircleShape)
+                            .background(color = Color.LightGray),
                         dateUtil = dateUtil
                     )
                 }
