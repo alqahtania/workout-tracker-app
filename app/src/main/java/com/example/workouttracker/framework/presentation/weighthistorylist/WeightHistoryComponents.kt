@@ -45,6 +45,7 @@ fun WeightHistoryItemInputBackground(
 
 @Composable
 fun DropdownDemo(
+    modifier: Modifier = Modifier,
     items: List<String>,
     itemIndex: Int,
     onItemSelectedIndex: (Int) -> Unit
@@ -53,8 +54,7 @@ fun DropdownDemo(
     val disabledValue = items[0]
     var showMenu by remember { mutableStateOf(false) }
     Row(
-        modifier = Modifier
-            .width(50.dp)
+        modifier = modifier
             .clickable(onClick = { showMenu = true })
             .shadow(elevation = 2.dp, shape = CircleShape.copy(all = CornerSize(4.dp)))
             .padding(8.dp),
@@ -153,9 +153,8 @@ fun WeightAddButton(
     modifier: Modifier = Modifier,
     enabled: Boolean
 ) {
-    TextButton(
+    Button(
         onClick = onClick,
-        shape = CircleShape,
         enabled = enabled,
         modifier = modifier
     ) {

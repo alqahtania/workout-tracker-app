@@ -49,11 +49,7 @@ fun WeightHistoryScreen(
             elevate = enableTopSection,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (enableTopSection) {
-                WeightItemEntryInput(onItemComplete = { weight, unit, reps, sides ->
-                    onItemComplete(weight, unit, reps, sides)
-                })
-            } else {
+            if (!enableTopSection) {
                 Text(
                     "Editing item",
                     style = MaterialTheme.typography.h6,
@@ -64,7 +60,6 @@ fun WeightHistoryScreen(
                         .fillMaxWidth()
                 )
             }
-
         }
 
         LazyColumn(
@@ -159,6 +154,7 @@ fun WeightHistoryRow(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 Text(text = "${convertWeightToTwoDecimals(lbs)} lbs")
+                Text(text = weightHistory.sides ?: "Unknown Sides")
                 Text(text = "${convertWeightToTwoDecimals(kg)} kg")
                 if (buttonSlot != null) {
                     Box(Modifier.align(Alignment.CenterVertically)) {
@@ -254,7 +250,12 @@ fun WeightItemEntryInput(
     val (repsValue, onRepsChanged) = remember { mutableStateOf("") }
 
     val submit = {
-        onItemComplete(numberValue.toDouble(), items[itemIndex], repsValue.toLong(), sides[sidesIndex])
+        onItemComplete(
+            numberValue.toDouble(),
+            items[itemIndex],
+            repsValue.toLong(),
+            sides[sidesIndex]
+        )
         onItemSelectedIndex(0)
         onNumberChanged("")
         onRepsChanged("")
@@ -269,12 +270,15 @@ fun WeightItemEntryInput(
         onItemComplete = submit,
         repsValue = repsValue,
         onRepsValueChanged = onRepsChanged,
-        sides= sides,
+        sides = sides,
         sideIndex = sidesIndex,
         onSideSelectedIndex = onSideSelectedIndex
     ) {
 
         WeightAddButton(
+            modifier = Modifier
+                .fillMaxWidth(0.80f)
+                .padding(bottom = 24.dp),
             onClick = submit,
             text = "Add",
             enabled = numberValue.isNotBlank() && (itemIndex != 0) && repsValue.isNotBlank() && sidesIndex != 0
@@ -302,61 +306,55 @@ fun WeightItemInput(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     Column {
-        Row(
+
+        WeightInputField(
             modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 8.dp),
+            items = items,
+            itemIndex = itemIndex,
+            onItemSelectedIndex = onItemSelectedIndex,
+            numberValue = numberValue,
+            onNumberChanged = onNumberChanged,
+            onItemComplete = onItemComplete,
+            reps = repsValue,
+            sideIndex = sideIndex
         )
-        {
-            WeightInputField(
-                modifier = Modifier.weight(0.5f),
-                items = items,
-                itemIndex = itemIndex,
-                onItemSelectedIndex = onItemSelectedIndex,
-                numberValue = numberValue,
-                onNumberChanged = onNumberChanged,
-                onItemComplete = onItemComplete,
-                reps = repsValue,
-                sideIndex = sideIndex
-            )
 
-            Spacer(modifier = Modifier.width(8.dp))
-            TextField(
-                modifier = Modifier.weight(0.30f),
-                value = repsValue, onValueChange = onRepsValueChanged,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.NumberPassword
-                ),
-                keyboardActions = KeyboardActions(onDone = {
-                    if (numberValue.isNotBlank() && itemIndex != 0 && repsValue.isNotBlank() && sideIndex != 0) {
-                        onItemComplete()
-                    }
-                    keyboardController?.hide()
-                }),
-                singleLine = true,
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
-                placeholder = {
-                    Text(text = "Reps")
-                },
-                maxLines = 1
-            )
+        DropdownDemo(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 8.dp),
+            items = sides,
+            itemIndex = sideIndex,
+            onItemSelectedIndex = onSideSelectedIndex
+        )
 
-            DropdownDemo(
-                items = sides,
-                itemIndex = sideIndex,
-                onItemSelectedIndex = onSideSelectedIndex
-            )
+        TextField(
+            modifier= Modifier.fillMaxWidth(0.9f).padding(bottom = 16.dp, start = 8.dp, end = 8.dp),
+            value = repsValue, onValueChange = onRepsValueChanged,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.NumberPassword
+            ),
+            keyboardActions = KeyboardActions(onDone = {
+                if (numberValue.isNotBlank() && itemIndex != 0 && repsValue.isNotBlank() && sideIndex != 0) {
+                    onItemComplete()
+                }
+                keyboardController?.hide()
+            }),
+            singleLine = true,
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
+            placeholder = {
+                Text(text = "Reps")
+            },
+            maxLines = 1
+        )
 
-            Box(
-                Modifier
-                    .align(Alignment.CenterVertically)
-                    .weight(0.20f)
-            ) { buttonSlot() }
-
-        }
+        Box(
+            Modifier
+                .align(Alignment.CenterHorizontally)
+        ) { buttonSlot() }
     }
 
 }

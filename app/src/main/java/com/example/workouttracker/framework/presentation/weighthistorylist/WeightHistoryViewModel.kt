@@ -23,10 +23,7 @@ import com.example.workouttracker.framework.presentation.common.BaseViewModel
 import com.example.workouttracker.framework.presentation.musclelist.state.MuscleListStateEvent
 import com.example.workouttracker.framework.presentation.weighthistorylist.state.WeightHistoryStateEvent
 import com.example.workouttracker.framework.presentation.weighthistorylist.state.WeightHistoryViewState
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 
 class WeightHistoryViewModel
 @ViewModelInject
@@ -68,7 +65,12 @@ constructor(
 
     }
 
+    private val _openBottomSheet = MutableStateFlow(false)
+    val openBottomSheet = _openBottomSheet.asStateFlow()
 
+    fun setOpenBottomSheet(open: Boolean) {
+        _openBottomSheet.value = open
+    }
 
 
     override fun handleNewData(data: WeightHistoryViewState) {

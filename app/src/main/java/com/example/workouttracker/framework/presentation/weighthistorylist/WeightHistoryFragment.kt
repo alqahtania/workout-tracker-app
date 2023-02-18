@@ -13,14 +13,11 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -39,6 +36,7 @@ import com.example.workouttracker.R
 import com.example.workouttracker.domain.model.weight_history.WeightHistoryFactory
 import com.example.workouttracker.domain.util.DateUtil
 import com.example.workouttracker.framework.presentation.ui.WorkoutTrackerTheme
+import com.example.workouttracker.framework.presentation.util.bottomsheet.showAsBottomSheet
 import com.example.workouttracker.framework.presentation.weighthistorylist.state.WeightHistoryStateEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -75,6 +73,36 @@ class WeightHistoryFragment : Fragment() {
                             onIconClicked = {
                                 findNavController().popBackStack()
                             })
+                    }, floatingActionButton = {
+                        FloatingActionButton(onClick = {
+                            val enableTopSection = viewModel.currentEditItem == null
+                            if (enableTopSection) {
+                                showAsBottomSheet(
+                                    isDarkTheme = args.themeState,
+                                    wrapWithBottomSheetUI = true,
+                                ) { action ->
+                                    WeightItemEntryInput(onItemComplete = { weight, unit, reps, sides ->
+                                        val newHistory =
+                                            weightHistoryFactory.createSingleWeightHistory(
+                                                muscleEquipmentId = args.muscleEquipId,
+                                                weight = weight,
+                                                unit = unit,
+                                                reps = reps,
+                                                sides = sides
+                                            )
+                                        val stateEvent =
+                                            WeightHistoryStateEvent.InsertWeightHistoryEvent(
+                                                newHistory
+                                            )
+
+                                        viewModel.setStateEvent(stateEvent)
+                                        action()
+                                    })
+                                }
+                            }
+                        }) {
+                            Icon(Icons.Default.Add, contentDescription = "")
+                        }
                     }) { innerPadding ->
                         Column {
 //                            Text(text = "Welcome to the weight history screen")
@@ -163,6 +191,11 @@ class WeightHistoryFragment : Fragment() {
             },
             backgroundColor = MaterialTheme.colors.primarySurface
         )
+    }
+
+
+    private fun setupBottomSheet() {
+
     }
 
 

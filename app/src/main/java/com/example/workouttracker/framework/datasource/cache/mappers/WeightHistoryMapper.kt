@@ -43,7 +43,8 @@ constructor(
             weight = entity.weight,
             unit = entity.unit,
             createdAt = dateUtil.convertFromDbEntityTimeToStringDate(entity.createdAt),
-            reps = entity.reps
+            reps = entity.reps,
+            sides = entity.side
         )
     }
 

@@ -135,12 +135,6 @@
             "columnName": "reps",
             "affinity": "INTEGER",
             "notNull": false
-          },
-          {
-            "fieldPath": "side",
-            "columnName": "side",
-            "affinity": "TEXT",
-            "notNull": false
           }
         ],
         "primaryKey": {
